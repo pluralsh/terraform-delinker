@@ -11,8 +11,6 @@ import (
 	"github.com/pluralsh/terraform-delinker/internal"
 )
 
-type PlannerOption func(*Planner)
-
 func WithTerraform(options ...v1alpha1.ExecutableOption) PlannerOption {
 	return func(p *Planner) {
 		p.terraform = v1alpha1.NewExecutable(v1alpha1.CommandTerraform, options...)
@@ -25,13 +23,9 @@ func WithDir(directory string) PlannerOption {
 	}
 }
 
-type Planner struct {
-	terraform *v1alpha1.Executable
-	directory string
-}
-
 func (this *Planner) Plan() (*tfjson.Plan, error) {
 	logrus.Debug("creating temp file")
+	// TODO add option to use custom dir to save file (needs encryption?)
 	f, err := os.CreateTemp("", "plural.tf.*.plan")
 	if err != nil {
 		return nil, err
@@ -67,6 +61,10 @@ func NewPlanner(options ...PlannerOption) *Planner {
 
 	for _, o := range options {
 		o(planner)
+	}
+
+	if planner.terraform == nil {
+		logrus.Fatal("terraform not defined, use WithTerraform option to configure planner")
 	}
 
 	return planner

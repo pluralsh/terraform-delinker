@@ -2,13 +2,10 @@ package v1alpha1
 
 import (
 	tfjson "github.com/hashicorp/terraform-json"
+	"github.com/sirupsen/logrus"
 
 	"github.com/pluralsh/terraform-delinker/internal"
 )
-
-type PlanAnalyzer struct {
-	plan *tfjson.Plan
-}
 
 func (this *PlanAnalyzer) Analyze(filter ...tfjson.Action) *Report {
 	report := &Report{
@@ -16,7 +13,8 @@ func (this *PlanAnalyzer) Analyze(filter ...tfjson.Action) *Report {
 	}
 
 	for _, resource := range this.plan.ResourceChanges {
-		if includes := internal.IncludesArray(resource.Change.Actions, filter); !includes {
+		logrus.Debugf("checking if resource %s matches %v action", resource.Address, filter)
+		if includes := internal.IncludesArray(resource.Change.Actions, filter); len(filter) > 0 && !includes {
 			continue
 		}
 
@@ -28,6 +26,7 @@ func (this *PlanAnalyzer) Analyze(filter ...tfjson.Action) *Report {
 		})
 	}
 
+	logrus.Debugf("found %d resources", len(report.Resources))
 	return report
 }
 

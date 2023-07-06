@@ -12,3 +12,7 @@ type Resource struct {
 	Actions tfjson.Actions
 	Type    string
 }
+
+type PlanAnalyzer struct {
+	plan *tfjson.Plan
+}

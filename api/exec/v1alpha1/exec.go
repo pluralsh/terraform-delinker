@@ -24,11 +24,11 @@ func (this *Executable) Run(args ...string) (output []byte, err error) {
 }
 
 func NewExecutable(command Command, options ...ExecutableOption) *Executable {
-	exec := &Executable{command: command}
+	executable := &Executable{command: command}
 
 	for _, o := range options {
-		o(exec)
+		o(executable)
 	}
 
-	return exec
+	return executable
 }
