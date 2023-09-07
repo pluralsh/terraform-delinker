@@ -21,6 +21,7 @@ func (this *Delinker) Run(report *analyzev1alpha1.Report) error {
 
 	logrus.Info("delinking resources")
 	for _, r := range report.Resources {
+		logrus.WithFields(logrus.Fields{"name": r.Address}).Info("Delinking resource from terraform state")
 		output, err := this.terraform.Run("state", "rm", r.Address)
 		if err != nil {
 			return err
